@@ -3,6 +3,8 @@ class User < ApplicationRecord
     validates :email, :session_token, presence: true, uniqueness: true
     validates :password_digest, presence: true
 
+    before_validation :ensure_session_token
+
     # Now when you have this, 
     # when trying to save a model without a pwd field, it will try to access
     # the attr_reader for password column which in our case wont exist as 
@@ -57,10 +59,7 @@ class User < ApplicationRecord
 
     def self.find_by_credentials(email, password)
         user_obj = User.find_by(email: email)
-        if user_obj && user_obj.is_password?(password)
-            user_obj
-        end
-        return nil
+        user_obj && user_obj.is_password?(password) ? user_obj : nil
     end
     
 end

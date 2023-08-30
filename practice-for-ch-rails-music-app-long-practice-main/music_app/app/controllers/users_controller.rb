@@ -3,21 +3,23 @@ class UsersController < ApplicationController
     before_action :require_logged_out, only: [:new, :create]
 
     def new
-        render json: "Welcome to create user page"
+        render :new
     end
 
     def show
         @user = User.find(params[:id])
-        render json: @user
+        render :show
     end
 
     def create
-        @user = User.new(params.require(:user).permit(:password, :email))
+        @user = User.new(params.require(:user).permit(:email, :password))
         if @user.save
             login!(@user)
-            render json: @user
+            flash.now[:notice] = "Successfully created user !!"
+            render :show
         else
-            render json: @user.errors.full_messages, status: 422
+            flash.now[:errors] = @user.errors.full_messages
+            render :new
         end
     end
 

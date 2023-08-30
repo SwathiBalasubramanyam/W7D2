@@ -10,6 +10,23 @@
   </head>
 
   <body>
+    <h1>Welcome to Swathi's Music App!!</h1>
+    <% if flash.now[:errors] %>
+      <% flash.now[:errors].each do |error| %>
+          <%= error %><br />
+      <% end %>
+    <% end %> <br>
+    <% if current_user %>
+      <h2>Logged in as <%= @current_user.email%></h2>
+      
+      <form action="<%= sessions_url %>" method="post">
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+        <input type="hidden" name="_method" value="DELETE">
+        <input type="submit" value="Logout">
+      </form>
+      
+    <% end %>
     <%= yield %>
+
   </body>
 </html>

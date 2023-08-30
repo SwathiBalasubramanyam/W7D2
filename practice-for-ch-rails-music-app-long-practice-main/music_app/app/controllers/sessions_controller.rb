@@ -3,21 +3,29 @@ class SessionsController < ApplicationController
     before_action :require_logged_out, only: [:new, :create]
 
     def new
-        render json: "Pls login in using the below form"
+        render :new
     end
 
     def create
-        @user = User.find_by_credentials(params.require(:user).permit(:email, :password))
+        up = user_params
+        @user = User.find_by_credentials(up[:email], up[:password])
         if @user
-            @user.reset_session_token!
+            session[:session_token] = @user.reset_session_token!
+            flash[:notice] = "Successfully logged in!!"
             redirect_to user_url(@user)
         else
+            flash.now[:errors] = ["Couldn't find a user with the given credentials, pls try again"]
             render :new
         end
     end
 
     def destroy
-        logout!
+        logout!(@current_user)
         redirect_to new_sessions_url
+    end
+
+    private
+    def user_params
+        params.require(:user).permit(:email, :password)
     end
 end
