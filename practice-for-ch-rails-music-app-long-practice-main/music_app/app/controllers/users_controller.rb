@@ -1,8 +1,9 @@
 class UsersController < ApplicationController
+    before_action :require_logged_in, only: :show
+    before_action :require_logged_out, only: [:new, :create]
 
-    def index
-        @users = User.all()
-        render json: @user
+    def new
+        render json: "Welcome to create user page"
     end
 
     def show
@@ -11,18 +12,13 @@ class UsersController < ApplicationController
     end
 
     def create
-        @user = User.new(params[:user])
-        @user.save!
+        @user = User.new(params.require(:user).permit(:password, :email))
+        if @user.save
+            login!(@user)
+            render json: @user
+        else
+            render json: @user.errors.full_messages, status: 422
+        end
     end
 
-    def update
-        @user = User.find(params[:id])
-        @user.update(params[:user])
-        @user.save!
-    end
-
-    def destroy
-        User.delete(params[:id])
-    end
-    
 end
